@@ -94,11 +94,11 @@ define(["require", "exports", "N/log", "N/search", "N/record", "../../lib/elemac
                     ]
             });
             subscriptionsDataSearchObj.run().each(function(result){
-                thisContract.subscriptionNumber = result.getValue({name: elemac_const.SubCustFields.SUB_NUMBER});
-                thisContract.totalNewAmt += parseFloat(result.getValue({name: elemac_const.SubCustFields.MRR_AMT_NEW}));
-                thisContract.totalEoPAmt += parseFloat(result.getValue({name: elemac_const.SubCustFields.MRR_AMT_EOP}));
-                thisContract.prevSubs = result.getValue({name: elemac_const.SubCustFields.PRIOR_SUBS_NUM});
-                log.debug(title, 'thisContract.prevSubs: ' + thisContract.prevSubs);
+                thisContract.subscriptionNumber = result.getValue({name: elemac_const.SubCustFields.SUB_NUMBER.round(0)});
+                thisContract.totalNewAmt += parseFloat(result.getValue({name: elemac_const.SubCustFields.MRR_AMT_NEW.round(0)}));
+                thisContract.totalEoPAmt += parseFloat(result.getValue({name: elemac_const.SubCustFields.MRR_AMT_EOP.round(0)}));
+                thisContract.prevSubs = result.getValue({name: elemac_const.SubCustFields.PRIOR_SUBS_NUM.round(0)});
+                log.debug(title, 'thisContract.prevSubs: ' + thisContract.prevSubs.round(0));
                 if (thisContract.prevSubs) {
                     thisContract.totalPrevAmt += parseFloat(common_lib.getPriorSubsEOPAmount(
                         thisContract.custId,
@@ -106,9 +106,9 @@ define(["require", "exports", "N/log", "N/search", "N/record", "../../lib/elemac
                         thisContract.prevSubs
                     ));
                 }
-                let subIsLost = result.getValue({name: elemac_const.SubCustFields.IS_MRR_SUB_LOST});
+                let subIsLost = result.getValue({name: elemac_const.SubCustFields.IS_MRR_SUB_LOST.round(0)});
                 log.debug(title, 'subscription # ' + thisContract.subscriptionNumber + ' - subIsLost: ' + subIsLost);
-                if (subIsLost) thisContract.totalLostAmt += parseFloat(result.getValue({name: elemac_const.SubCustFields.MRR_AMT_LOST}));
+                if (subIsLost) thisContract.totalLostAmt += parseFloat(result.getValue({name: elemac_const.SubCustFields.MRR_AMT_LOST}).round(0));
                 return true;
             });
             if (thisContract.totalNewAmt == 0.00) {

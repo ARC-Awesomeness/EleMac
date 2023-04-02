@@ -63,15 +63,15 @@ define(["require", "exports", "N/record", "N/log", "N/search", "N/ui/serverWidge
                     fieldId: "custcol_em_mrr_recurring"
                 });
                 log.debug(title, 'recurring: ' + recurring);
-                if (recurring == "F") {
+                if (recurring === 'F') {
                     let itemText = loadedTransactionRecord.getCurrentSublistText({
                         sublistId: "item",
                         fieldId: "item"
                     });
                     log.debug(title, 'itemText: ' + itemText);
-                    if (itemText.indexOf('Insights') > -1) recurring = "T";
+                    if (itemText.indexOf('Insights') > -1) recurring = 'T';
                 }
-                if (recurring == "T") {
+                if (recurring === 'T') {
                     let amount = loadedTransactionRecord.getCurrentSublistValue({
                         sublistId: "item",
                         fieldId: "amount"
@@ -1165,7 +1165,6 @@ define(["require", "exports", "N/record", "N/log", "N/search", "N/ui/serverWidge
     const getDays360 = (sd, fd) => {
         let d1 = new Date(sd);
         let d2 = new Date(fd);
-        let rDays = 0.000;
         let d1_1 = d1;
         let d2_1 = d2;
         let d1_y = d1.getFullYear();
@@ -1195,19 +1194,8 @@ define(["require", "exports", "N/record", "N/log", "N/search", "N/ui/serverWidge
         dy = d2_y - d1_y;
         dm = d2_m - d1_m;
         dd = d2_d - d1_d;
-
-        rDays = dy * 360 + dm * 30 + dd + 1;
-
-        if (d1.getFullYear() != d2.getFullYear()) {
-            // Do nothing
-        }
-        else {
-            rDays --;
-        }
-
         log.debug('getDays360', 'dy: ' + dy + 'dm: ' + dm + 'dd: ' + dd);
-        log.debug('ret getDays360', rDays);
-        return rDays; //parseFloat(dy * 360 + dm * 30 + dd); // return dy * 360 + dm * 30 + dd + 1;
+        return parseFloat(dy * 360 + dm * 30 + dd); // return dy * 360 + dm * 30 + dd + 1;
     }
     const WeekOfYear = () => {
         var currentRecord = context.currentRecord;
