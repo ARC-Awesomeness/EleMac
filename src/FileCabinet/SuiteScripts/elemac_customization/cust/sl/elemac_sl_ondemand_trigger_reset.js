@@ -23,27 +23,26 @@ define(['N/error', 'N/record', 'N/redirect', 'N/search', 'N/task', 'N/ui/message
             const title = 'onRequest';
             try {
                 if(context.request.method === 'GET') {
-                    try {
-                        let form = ui.createForm({
-                            title: 'Trigger MRR/ARR Data Reset script'  //Trigger Scheduled JOB manually
-                        });
-                        form.addSubmitButton({label: 'Run MRR/ARR Reset script 2'});
-                        context.response.writePage(form);
-                    } catch (e) {
-                        log.error(title, 'Error while initiating form due to: ' + e.message);
-                    }
+
+                    build_form("");
+
                 } else {
                     try {
 
-                        let _contract = "2019-555";
+                        log.debug('parameters', context.request.parameters);
 
+                        let _contract = context.request.parameters.custpage_contract;
                         log.debug("contract", _contract);
+
+                        let _createdFrom = context.request.parameters.custpage_createdfrom; //"Invoice #INV-1397";
+                        log.debug("Created From", _createdFrom);
 
                         let mrTask = task.create({taskType: task.TaskType.MAP_REDUCE});
                         mrTask.scriptId = 'customscript_elemac_mrr_mr_contr_reset';
                         mrTask.deploymentId = 'customdeploy_elemac_mrr_mr_contr_reset';
                         mrTask.params = {
-                            custscript_contractparam : _contract
+                            custscript_contractparam : _contract,
+                            custscript_createdfromparam : _createdFrom
                         };
 
                         log.debug("task", mrTask);
@@ -51,10 +50,59 @@ define(['N/error', 'N/record', 'N/redirect', 'N/search', 'N/task', 'N/ui/message
                         let mrTaskId = mrTask.submit();
                         let taskStatus = task.checkStatus(mrTaskId);
                         log.debug(title, "taskStatus: " + taskStatus);
+
+                        build_form("RESET HAS BEEN TRIGGERED");
+
                     } catch (e) {
                         log.error(title, 'Error in triggering the script' + e);
                         context.response.write('Unable to trigger the script due to :' + e.message);
                     }
+                }
+
+                function build_form(infomessage) {
+
+                    try {
+                        let form = ui.createForm({
+                            title: 'Trigger MRR/ARR Data Reset script' 
+                        });
+
+                        if (infomessage === "") {
+
+                            form.addSubmitButton({label: 'Run MRR/ARR Reset script'});
+
+                            var _contractField = form.addField({
+                                id : 'custpage_contract',
+                                type : ui.FieldType.TEXT,
+                                source : '_contractdata',
+                                label : 'Contract'
+                            });
+
+                            var _createdFromField = form.addField({
+                                id : 'custpage_createdfrom',
+                                type : ui.FieldType.TEXT,
+                                source : '_createfromdata',
+                                label : 'Created From'
+                            });
+
+                        }
+                        else {
+
+                            var _infoMessage = form.addField({
+                                id : 'custpage_infomessage',
+                                type : ui.FieldType.LABEL,
+                                label: 'initializing'
+                            });
+
+                            _infoMessage.label = infomessage;
+
+                        }
+
+                        context.response.writePage(form);
+
+                    } catch (e) {
+                        log.error(title, 'Error while initiating form due to: ' + e.message);
+                    }
+
                 }
             } catch (e) {
                 log.error(title, 'Error while creating screen: ' + e);

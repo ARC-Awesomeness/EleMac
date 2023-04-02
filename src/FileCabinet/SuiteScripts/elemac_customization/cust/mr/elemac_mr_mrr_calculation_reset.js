@@ -26,25 +26,38 @@ define(['N/email', 'N/format', 'N/record', 'N/runtime', 'N/search', "../../lib/e
 
             log.debug("starting", "");
 
-            log.debug("context", context);
-
             var _currentScript = runtime.getCurrentScript();
-
-            log.debug("getCurrentScript()", _currentScript);
-
             var _contractNumber = _currentScript.getParameter({name: 'custscript_contractparam'});
-
             log.debug("contract", _contractNumber);
 
-            _contractNumber = "2019-555";
+            var _createdFrom = _currentScript.getParameter({name: 'custscript_createdfromparam'});
+            log.debug("Created From", _createdFrom);
 
-            log.debug("contract-manual", _contractNumber);
+            var _period = "";
+
+
+            var _documentNumber = "";
+
 
             let contractSearch = search.create({
                 type: elemac_const.CustRecords.ELEM_CONTRACT,
                 filters:
                     [
-                        ["name","is",_contractNumber]
+                        //["name","is",_contractNumber]
+
+                        search.createFilter({
+                            name: 'name',
+                            join: 'custrecord_elem_cont_number',
+                            operator: search.Operator.IS,
+                            values: [_contractNumber]
+                        })//,
+                        // search.createFilter({
+                        //     name: 'number',
+                        //     join: 'custrecord_elem_cont_so_number',
+                        //     //operator: search.Operator.ISEMPTY
+                        //     operator: search.Operator.ANYOF,
+                        //     values: [_documentNumber]
+                        // })
                     ],
                 columns:
                     [
@@ -60,7 +73,9 @@ define(['N/email', 'N/format', 'N/record', 'N/runtime', 'N/search', "../../lib/e
                             join: "CUSTRECORD_ELEM_CONT_PERIOD",
                             sort: search.Sort.ASC,
                             label: "Period Internal ID"
-                        })
+                        }),
+                        search.createColumn({name: elemac_const.ContCustFields.CONTRACT_CREATED_FROM, label: "Created From"})
+
                     ]
             });
 
@@ -75,21 +90,64 @@ define(['N/email', 'N/format', 'N/record', 'N/runtime', 'N/search', "../../lib/e
         function map (context) {
 
             const title = "elemac_mr_reset_contracts.map";
-            log.debug(title, "context: " +context);
+            //log.debug(title, "context: " + context);
+
+            var _currentScript = runtime.getCurrentScript();
+            var _contractNumber = _currentScript.getParameter({name: 'custscript_contractparam'});
+            log.debug("contract", _contractNumber);
+
+            var _createdFrom = _currentScript.getParameter({name: 'custscript_createdfromparam'});
+            log.debug("Created From", _createdFrom);
 
 
-            // try {
-            //     let value = JSON.parse(context.value);
-            //     log.debug(title, "values: " + value);
-            //     let contId = value.id;
-            //     log.debug(title, "deleting contract " + contId);
-            //     record.delete({
-            //         type: 'customrecord_elem_contracts_data',
-            //         id: contId
-            //     });
-            // } catch (e) {
-            //     log.error(title, "error: " + e);
-            // }
+            let value = JSON.parse(context.value);
+
+            let contextvalues = JSON.stringify(context.value);
+            log.debug("contextvalues", contextvalues);
+
+            let _documentNumber = value.values.custrecord_elem_cont_so_number.text;
+            log.debug("_documentNumber", '|' + _documentNumber + '|');
+
+            let _targetDocumentNumber = _createdFrom; //"" //"Invoice #INV-1397";
+            log.debug("_targetDocumentNumber", _targetDocumentNumber);
+
+            if(_documentNumber == null) {
+
+                log.debug("EMPTY VERIFICATION");
+
+            }
+
+            if (_documentNumber == _targetDocumentNumber || (_documentNumber == null && _targetDocumentNumber == null)){
+
+                try {
+
+                    //let _obj = JSON.parse(contextvalues);
+                    //log.debug("_obj", _obj);
+
+                    let _contract = value.values.custrecord_elem_cont_number.text;
+                    log.debug("_contract", _contract);
+
+                    let _period = value.values.custrecord_elem_cont_period.text;
+                    log.debug("_period", _period);
+
+                    let _customer = value.values.custrecord_elem_cont_number.text;
+                    log.debug("_customer", _customer);
+
+
+                    //log.debug(title, "values: " + value);
+                    let contId = value.id;
+                    log.debug(title, "deleting contract " + contId);
+
+                    // record.delete({
+                    //     type: 'customrecord_elem_contracts_data',
+                    //     id: contId
+                    // });
+                } catch (e) {
+                    log.error(title, "error: " + e);
+                }
+
+            }
+
 
         }
 
