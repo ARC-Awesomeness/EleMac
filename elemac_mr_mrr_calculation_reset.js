@@ -144,13 +144,8 @@ define(['N/email', 'N/format', 'N/record', 'N/runtime', 'N/search', "../../lib/e
                     log.debug("deleting contract id", contId);
 
                     //related subscription record id- multiple?
-                    var subsId = testing.internalid.CUSTRECORD_ELEM_SUB_CONTRACT.text;
-                    // var subsId=testing.getValue({
-                    //   name: 'internalid',
-                    //   join: 'CUSTRECORD_ELEM_SUB_CONTRACT'
-                    //  });
 
-                    //   var subsId = 16421;
+                    var subsId = testing["internalid.CUSTRECORD_ELEM_SUB_CONTRACT"].value;
                     log.debug("deleting subscription id", subsId);
                     //do they need to delete saas contract number record too- customrecord_elem_contract_numbers?
 
