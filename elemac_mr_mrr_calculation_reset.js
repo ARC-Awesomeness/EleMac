@@ -50,7 +50,7 @@ define(['N/email', 'N/format', 'N/record', 'N/runtime', 'N/search', "../../lib/e
                             join: 'custrecord_elem_cont_number',
                             operator: search.Operator.IS,
                             values: [_contractNumber]
-                        })//,
+                        }),
                         // search.createFilter({
                         //     name: 'number',
                         //     join: 'custrecord_elem_cont_so_number',
@@ -58,6 +58,14 @@ define(['N/email', 'N/format', 'N/record', 'N/runtime', 'N/search', "../../lib/e
                         //     operator: search.Operator.ANYOF,
                         //     values: [_documentNumber]
                         // })
+                                            //   "AND", 
+  //    ["custrecord_elem_cont_period.startdate","notbefore","01/01/2023"]
+                        search.createFilter({
+                            name: 'startdate',
+                             join: 'custrecord_elem_cont_period',
+                             operator: search.Operator.NOTBEFORE,
+                             values:"01/01/2023"
+                         })
                     ],
                 columns:
                     [
